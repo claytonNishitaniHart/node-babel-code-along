@@ -76,6 +76,31 @@ server.put('/api/marketplaces/:id', async (req, res) => {
 
         return res.status(500).send(error);
     }
+});
+
+server.delete('/api/marketplaces/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({ error: 'Marketplace id is required' });
+        }
+
+        const marketplace = await Marketplaces.findByIdAndDelete(id);
+
+        return res.status(200).json({
+            success: true,
+            data: marketplace
+        });
+    } catch (error) {
+        console.error(error);
+
+        if (error.kind == 'ObjectId' && error.path == '_id') {
+            return res.status(400).json({ error: 'Invalid ID parameter' });
+        }
+
+        return res.status(500).send(error);
+    }
 })
 
 server.use('*', (req, res) => {
