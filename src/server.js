@@ -1,21 +1,54 @@
 import express from 'express';
-import { connect, disconnect } from "./database";
-import Books from "./models/bookModel";
+import { connect, disconnect } from './database';
+import Marketplaces from './models/marketplaceModel';
 
 connect();
 
-const server = express();
 const PORT = 5000;
+const server = express();
 
-server.get('/books', async (req, res) => {
+server.use(express.json());
+
+server.get('/api/marketplaces', async (req, res) => {
     try {
-        const books = await Books.find({});
-        console.log(books);
-        return res.json(books);
+        const marketplaces = await Marketplaces.find({});
+        console.log(marketplaces);
+        return res.json(marketplaces);
     } catch (error) {
         console.error(error);
         return res.status(500).send(error);
     }
+})
+
+server.post('/api/marketplaces', async (req, res) => {
+    try {
+        const { body } = req;
+        if (!body.hasOwnProperty('name') || !body.hasOwnProperty('description') || !body.hasOwnProperty('owner')) {
+            return res.status(400).json({ error: 'Marketplace name, description, owner required' });
+        }
+
+        const marketplaceExists = await Marketplaces.findOne({ name: body.name });
+
+        if (marketplaceExists) {
+            return res.status(400).json({ error: 'Marketplace name already in use' });
+        }
+
+        const marketplace = new Marketplaces(body);
+
+        await marketplace.save();
+
+        return res.status(200).json({
+            success: true,
+            data: marketplace
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send(error);
+    }
+});
+
+server.use('*', (req, res) => {
+    return res.status(404).json({ error: 'Route not found' });
 })
 
 server.listen(PORT, () => {
