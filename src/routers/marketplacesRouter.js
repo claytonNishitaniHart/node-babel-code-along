@@ -1,19 +1,19 @@
 import { Router } from 'express';
+import errorHandler from '../middleware/errorHandler';
 import Marketplaces from '../models/marketplaceModel';
 const router = Router();
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
         const marketplaces = await Marketplaces.find({});
         console.log(marketplaces);
         return res.json(marketplaces);
     } catch (error) {
-        console.error(error);
-        return res.status(500).send(error);
+        next(error);
     }
 })
 
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
     try {
         const { body } = req;
         if (!body.hasOwnProperty('name') || !body.hasOwnProperty('description') || !body.hasOwnProperty('owner')) {
@@ -35,12 +35,11 @@ router.post('/', async (req, res) => {
             data: marketplace
         });
     } catch (error) {
-        console.error(error);
-        return res.status(500).send(error);
+        next(error);
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
     try {
         const { body } = req;
         const { id } = req.params;
@@ -61,17 +60,15 @@ router.put('/:id', async (req, res) => {
             data: marketplace
         });
     } catch (error) {
-        console.error(error);
-
         if (error.kind == 'ObjectId' && error.path == '_id') {
             return res.status(400).json({ error: 'Invalid ID parameter' });
         }
 
-        return res.status(500).send(error);
+        next(error);
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
 
@@ -86,13 +83,11 @@ router.delete('/:id', async (req, res) => {
             data: marketplace
         });
     } catch (error) {
-        console.error(error);
-
         if (error.kind == 'ObjectId' && error.path == '_id') {
             return res.status(400).json({ error: 'Invalid ID parameter' });
         }
 
-        return res.status(500).send(error);
+        next(error);
     }
 })
 
