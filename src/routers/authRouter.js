@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import argon2 from 'argon2';
 import User from '../models/userModel';
 
 const router = Router();
@@ -21,7 +22,9 @@ router.post('/register', async (req, res, next) => {
             return res.status(400).json({ error: 'username or email already exists' });
         }
 
-        const newUser = new User(body);
+        const hash = await argon2.hash(password);
+
+        const newUser = new User({ ...body, password: hash });
         await newUser.save();
 
         return res.status(201).json({ success: true });
