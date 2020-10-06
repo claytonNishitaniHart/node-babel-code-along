@@ -1,4 +1,3 @@
-import { Schema } from "mongoose"
 import mongoose, { Schema } from 'mongoose';
 
 const model = new Schema({
@@ -10,4 +9,4 @@ const model = new Schema({
     groups: []
 });
 
-export default mongoose.Model('Users', model, 'users');
+export default mongoose.model('Users', model, 'users');

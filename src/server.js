@@ -5,7 +5,7 @@ import exampleRouter from './routers/exampleRouter';
 import marketplacesRouter from './routers/marketplacesRouter';
 import authRouter from './routers/authRouter';
 import errorHandler from './middleware/errorHandler';
-import Marketplaces from '../models/marketplaceModel';
+import Marketplaces from './models/marketplaceModel';
 
 connect();
 
@@ -22,7 +22,7 @@ server.use('*', (req, res) => {
     return res.status(404).json({ error: 'Route not found' });
 })
 
-server.use(errorHandler());
+server.use(errorHandler);
 
 server.listen(PORT, () => {
     console.log(`server is listening on port ${PORT}`);
